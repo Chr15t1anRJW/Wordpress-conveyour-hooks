@@ -22,11 +22,21 @@ add_action( 'activated_subscription', 'set_act_mem_stat', 10, 2 );
 
 //Product event tag
 function send_product_tag ($order_id){
+
  	  $order = new WC_Order($order_id);
 	  $user = $order->billing_email;
 	  $items = $order->get_items();
-	  $traits = array('has_purchased' => 'yes',) ;
+
+
+    //global $current_user;
+    //get_currentuserinfo();
+    //$user = $current_user->user_email;
+
+	 $traits = array('has_purchased' => 'yes',) ;
+
 	  conveyour_identify($user, $traits);
+
+
 		foreach ( $items as $item ) {
 		  $product_name = $item['name'];
 		  $product_name_underscores = str_replace(' ', '_', $product_name);
@@ -36,6 +46,8 @@ function send_product_tag ($order_id){
 		  $product_object = new WC_Product($myproduct_id);
     	  $product_price = $product_object->regular_price;
 		  $traits = array('product' => $my_product_name,'Item-Price' => $product_price,'Order-ID' => $order_id);
+
+
 		  conveyour_track($user,'Purchased_product',$traits);
 		}
 }
