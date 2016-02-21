@@ -1,7 +1,4 @@
 <?php
-
-
-
 /*Conveyour*/
 //Set subscription status as inactive -- Woo mem
 function set_deact_mem_stat($user_id){
