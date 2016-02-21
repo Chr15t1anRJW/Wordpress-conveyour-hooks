@@ -1,30 +1,35 @@
 <?php
 
 
+
 /*Conveyour*/
 //Set subscription status as inactive -- Woo mem
-function set_deact_mem_stat($order_id,$user_id){
-	global $current_user;
-	$identify = $current_user->user_email;
+function set_deact_mem_stat($user_id){
+	$sub_obj = get_user_by('id', $user_id);
+	$identify = $sub_obj->user_email;
 	$traits = array('subscription_status' => 'inactive',) ;
 	conveyour_identify($identify, $traits);
 	}
 add_action( 'cancelled_subscription', 'set_deact_mem_stat', 10, 2 );
+
+
 //Set subscription status as active -- Woo mem
-function set_act_mem_stat($order_id,$user_id){
-	global $current_user;
-	$identify = $current_user->user_email;
+function set_act_mem_stat($user_id){
+	$sub_obj = get_user_by('id', $user_id);
+	$identify = $sub_obj->user_email;
 	$traits = array('subscription_status' => 'active',) ;
 	conveyour_identify($identify, $traits);
 	}
 add_action( 'activated_subscription', 'set_act_mem_stat', 10, 2 );
+
+
 //Product event tag
 function send_product_tag ($order_id){
-	  global $current_user;
-      get_currentuserinfo();
-	  $user = $current_user->user_email;
-	  $order = new WC_Order($order_id);
+ 	  $order = new WC_Order($order_id);
+	  $user = $order->billing_email;
 	  $items = $order->get_items();
+	  $traits = array('has_purchased' => 'yes',) ;
+	  conveyour_identify($user, $traits);
 		foreach ( $items as $item ) {
 		  $product_name = $item['name'];
 		  $product_name_underscores = str_replace(' ', '_', $product_name);
@@ -37,7 +42,7 @@ function send_product_tag ($order_id){
 		  conveyour_track($user,'Purchased_product',$traits);
 		}
 }
-add_action('woocommerce_order_status_completed', 'send_product_tag', 10, 1);
+add_action('woocommerce_payment_complete', 'send_product_tag', 10, 1);
 
 
 // is paying CX
