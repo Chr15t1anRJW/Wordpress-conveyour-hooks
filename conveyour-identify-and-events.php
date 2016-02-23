@@ -20,22 +20,23 @@ function set_act_mem_stat($user_id){
 add_action( 'activated_subscription', 'set_act_mem_stat', 10, 2 );
 
 
-//Product event tag
+
+
 function send_product_tag ($order_id){
 
  	  $order = new WC_Order($order_id);
 	  $user = $order->billing_email;
 	  $items = $order->get_items();
-
-
-    //global $current_user;
-    //get_currentuserinfo();
-    //$user = $current_user->user_email;
-
-	 $traits = array('has_purchased' => 'yes',) ;
-
+	  $coupons = $order->get_used_coupons();
+	  $traits = array('has_purchased' => 'yes',) ;
 	  conveyour_identify($user, $traits);
 
+	if(isset($coupons)){
+		foreach ( $coupons as $coupon ) {
+		conveyour_track($user,'used_coupon',array('coupon' => $coupon));
+		}
+
+	}
 
 		foreach ( $items as $item ) {
 		  $product_name = $item['name'];
@@ -47,11 +48,11 @@ function send_product_tag ($order_id){
     	  $product_price = $product_object->regular_price;
 		  $traits = array('product' => $my_product_name,'Item-Price' => $product_price,'Order-ID' => $order_id);
 
-
 		  conveyour_track($user,'Purchased_product',$traits);
 		}
 }
 add_action('woocommerce_payment_complete', 'send_product_tag', 10, 1);
+
 
 
 // is paying CX
