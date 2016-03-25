@@ -88,4 +88,19 @@ function Affiliate_Identify_func() {
 add_shortcode( 'Affiliate', 'Affiliate_Identify_func' );
 
 
+
+//Grabs phone # from woocomerce order
+
+
+function send_phone($order_id){
+$order = new WC_Order($order_id);
+$user = $order->billing_email;
+$phone = $order->billing_phone;
+$traits = array('mobile' => $phone) ;
+conveyour_identify($user, $traits);
+}
+add_action('woocommerce_payment_complete', 'send_phone', 10, 1);
+
+
+
 ?>
